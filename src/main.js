@@ -48,11 +48,46 @@ const find = query =>
 const express = require("express")
 const app = express()
 
-app.get("/query", async function (req, res) {
+app.get("/query", async (req, res) => {
 	const query = req.query.q
 	console.log(query)
 	const results = await find(query)
 	res.send(results)
 })
+
+
+
+const { exec } = require('child_process')
+const filenameStmt = db.prepare(`
+SELECT
+  *
+FROM
+  metadata
+WHERE
+  name = ?
+`)
+const findPath = filename =>
+	new Promise((resolve, reject) => {
+		filenameStmt.all(filename, (err, rows) => {
+			if (err) {
+				reject(err)
+			}
+			resolve(rows)
+		})
+	})
+app.get("/open", async (req, res) => {
+	const { page, filename } = req.query
+	console.log(page, filename)
+	const results = await findPath(filename)
+	console.log(results)
+	const path = decodeURIComponent(results[0].path)
+	console.log(path)
+	res.send("ok")
+	console.log(`opening ${path}`)
+	console.log(`okular -p ${+page} ${path}`)
+	exec(`okular -p ${+page} "${path.replace(/\"/g, '\\"')}"`)
+	console.log(`done`)
+})
+
 
 app.listen(3000)
