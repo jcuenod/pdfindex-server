@@ -83,9 +83,8 @@ app.get("/open", async (req, res) => {
 	const path = decodeURIComponent(results[0].path)
 	console.log(path)
 	res.send("ok")
-	console.log(`opening ${path}`)
-	console.log(`okular -p ${+page} ${path}`)
-	exec(`okular -p ${+page} "${path.replace(/\"/g, '\\"')}"`)
+	console.log(`okular -p ${+page + 1} ${path}`)
+	exec(`okular -p ${+page + 1} "${path.replace(/\"/g, '\\"')}"`)
 	console.log(`done`)
 })
 
